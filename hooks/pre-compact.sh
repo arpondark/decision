@@ -37,11 +37,11 @@ SESSION_PARTIAL="$DECISION_DIR/.buffers/${SESSION_ID}.md"
 
 # Skip if claude isn't available — we don't want a broken hook to block compaction.
 if ! command -v claude >/dev/null 2>&1; then
-  echo "decision-log: claude CLI not found; skipping pre-compact incremental save" >&2
+  echo "decision: claude CLI not found; skipping pre-compact incremental save" >&2
   exit 0
 fi
 
-PROMPT="Run the decision-logger skill in incremental mode for this session.
+PROMPT="Run the decision-logger sub-skill of the decision skill in incremental mode for this session.
 
 Session id: $SESSION_ID
 Repo root: $REPO_ROOT
@@ -53,13 +53,13 @@ Status: incremental (PreCompact fired)
 
 Behavior:
 - If a partial file exists (matching session_id), update it in place — append/refine the 'What happened' and 'Context' sections, do NOT start over.
-- If no partial file exists and the session is short (<5 turns or no decision-shaped content), do NOT create a file. Output 'decision-logger: skip' and exit.
+- If no partial file exists and the session is short (<5 turns or no decision-shaped content), do NOT create a file. Output 'decision: skip' and exit.
 - If no partial file exists but turns since session start ARE decision-shaped, create a new file with status: incomplete (the session-end will mark it complete).
-- Otherwise output 'decision-logger: wrote <path>' or 'decision-logger: updated <path>'."
+- Otherwise output 'decision: wrote <path>' or 'decision: updated <path>'."
 
 # Soft timeout; hard cap is in hooks.json.
 timeout 80 claude -p "$PROMPT" || {
-  echo "decision-log: pre-compact incremental save failed or timed out; buffer preserved at $BUFFER_FILE" >&2
+  echo "decision: pre-compact incremental save failed or timed out; buffer preserved at $BUFFER_FILE" >&2
   exit 0
 }
 

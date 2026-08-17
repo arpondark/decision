@@ -1,10 +1,10 @@
 {
-  "name": "decision-plugin",
+  "name": "decision",
   "version": "0.1.0",
-  "description": "Claude Code plugin that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context.",
+  "description": "Claude Code skill (name: decision) that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context.",
   "license": "MIT",
   "author": {
-    "name": "code-genom-skill"
+    "name": "arpondark"
   },
   "keywords": [
     "claude-code",
@@ -35,10 +35,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/code-genom-skill/decision-plugin.git"
+    "url": "https://github.com/arpondark/decision.git"
   },
   "bugs": {
-    "url": "https://github.com/code-genom-skill/decision-plugin/issues"
+    "url": "https://github.com/arpondark/decision/issues"
   },
-  "homepage": "https://github.com/code-genom-skill/decision-plugin#readme"
+  "homepage": "https://github.com/arpondark/decision#readme"
 }

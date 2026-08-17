@@ -7,6 +7,8 @@ description: Captures *why* decisions were made during a Claude Code session —
 
 You capture the **why** behind decisions made during a coding session. The output lives at `.decision/<repo-root>/<date>-<slug>.md` and is committed to git so teammates (and future agents) inherit the context without re-deriving it.
 
+> **You are a sub-capability of the `decision` skill.** The `decision` skill surfaces you to Claude for write-mode work. The other sub-capability is `decision-briefing` (read mode). When the `decision` skill is invoked in write mode, it delegates to you.
+
 ## When you run
 
 You run from hooks:
@@ -14,7 +16,7 @@ You run from hooks:
 - `pre-compact.sh` — incremental update mid-session, **in place** (same file, append/refine)
 - `session-start.sh` sweep — finishes orphan `incomplete` files from a prior killed session
 
-You also run manually via the slash command `/decision-log` (see `commands/decision-log.md`).
+You also run manually via the slash command `/decision-review` (see `commands/decision-review.md`).
 
 ## Input you receive
 

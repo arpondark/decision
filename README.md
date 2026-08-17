@@ -1,8 +1,15 @@
-# decision-plugin
+# decision
 
-A Claude Code plugin that automatically captures **why** decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent (yours or a teammate's) can get caught up without re-reading history or re-deriving context that already exists.
+A Claude Code **skill named `decision`** that automatically captures **why** decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent (yours or a teammate's) can get caught up without re-reading history or re-deriving context that already exists.
 
 `/decision-review` to read. Hooks to write. Filter is strict: only decision-shaped sessions leave a trace.
+
+The public skill name is **`decision`**. Inside it, the skill dispatches to two named sub-capabilities:
+
+- **`decision-logger`** — write mode (capture).
+- **`decision-briefing`** — read mode (briefing).
+
+The `decision` skill is the entry point Claude Code loads; when work needs to happen, it invokes the appropriate sub-skill by name. Hooks and slash commands reference the sub-skill names directly.
 
 Works with **Claude Code** (full hook support), **Cursor** (real hooks), and degrades gracefully to other AI IDEs via rules + slash commands.
 
@@ -30,12 +37,12 @@ Pick **one** of the three install methods below. They all do the same thing — 
 ### Method 1 — npm registry (recommended for everyone else)
 
 ```bash
-npm install -g decision-plugin
+npm install -g decision
 mkdir -p ~/.claude/plugins/decision
-cp -r "$(npm root -g)/decision-plugin/.claude-plugin" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/decision-plugin/hooks" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/decision-plugin/skills" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/decision-plugin/commands" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/decision/.claude-plugin" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/decision/hooks" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/decision/skills" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/decision/commands" ~/.claude/plugins/decision/
 ```
 
 Restart Claude Code. Done.
@@ -46,24 +53,24 @@ If you'd rather not install globally (e.g. for a CI runner or to pin a version p
 
 ```bash
 # In your repo root
-npm install decision-plugin
+npm install decision
 mkdir -p ~/.claude/plugins/decision
-cp -r node_modules/decision-plugin/.claude-plugin ~/.claude/plugins/decision/
-cp -r node_modules/decision-plugin/{hooks,skills,commands} ~/.claude/plugins/decision/
+cp -r node_modules/decision/.claude-plugin ~/.claude/plugins/decision/
+cp -r node_modules/decision/{hooks,skills,commands} ~/.claude/plugins/decision/
 ```
 
 ### Method 2 — directly from GitHub (no npm publish required)
 
 ```bash
 # Pin to a tag (best — reproducible)
-npm install -g "github:code-genom-skill/decision-plugin#v0.1.0"
+npm install -g "github:arpondark/decision#v0.1.0"
 
 # Or, if you don't have npm package metadata and just want the files:
 mkdir -p ~/.claude/plugins/decision
-git clone --depth 1 --branch v0.1.0 https://github.com/code-genom-skill/decision-plugin.git /tmp/decision-plugin
-cp -r /tmp/decision-plugin/.claude-plugin ~/.claude/plugins/decision/
-cp -r /tmp/decision-plugin/{hooks,skills,commands} ~/.claude/plugins/decision/
-rm -rf /tmp/decision-plugin
+git clone --depth 1 --branch v0.1.0 https://github.com/arpondark/decision.git /tmp/decision
+cp -r /tmp/decision/.claude-plugin ~/.claude/plugins/decision/
+cp -r /tmp/decision/{hooks,skills,commands} ~/.claude/plugins/decision/
+rm -rf /tmp/decision
 ```
 
 Tip: replace `v0.1.0` with `main` if you want the bleeding edge.
@@ -73,15 +80,15 @@ Tip: replace `v0.1.0` with `main` if you want the bleeding edge.
 If you'll be iterating on the plugin locally and want `git pull` to update your install:
 
 ```bash
-git clone https://github.com/code-genom-skill/decision-plugin.git ~/decision-plugin
+git clone https://github.com/arpondark/decision.git ~/decision
 mkdir -p ~/.claude/plugins/decision
-ln -s ~/decision-plugin/.claude-plugin ~/.claude/plugins/decision/.claude-plugin
-ln -s ~/decision-plugin/hooks ~/.claude/plugins/decision/hooks
-ln -s ~/decision-plugin/skills ~/.claude/plugins/decision/skills
-ln -s ~/decision-plugin/commands ~/.claude/plugins/decision/commands
+ln -s ~/decision/.claude-plugin ~/.claude/plugins/decision/.claude-plugin
+ln -s ~/decision/hooks ~/.claude/plugins/decision/hooks
+ln -s ~/decision/skills ~/.claude/plugins/decision/skills
+ln -s ~/decision/commands ~/.claude/plugins/decision/commands
 ```
 
-Now `cd ~/decision-plugin && git pull` updates your Claude install.
+Now `cd ~/decision && git pull` updates your Claude install.
 
 ---
 
@@ -93,10 +100,11 @@ Cursor has first-class hooks (via `~/.cursor/hooks.json`) that run on the same l
 
 ```bash
 # macOS / Linux
-git clone https://github.com/code-genom-skill/decision-plugin.git ~/.cursor/decision-plugin
+git clone https://github.com/arpondark/decision.git ~/.cursor/decision
 mkdir -p ~/.cursor/rules ~/.cursor/hooks
-cp -r ~/.cursor/decision-plugin/skills/decision-logger ~/.cursor/rules/decision-logger
-cp -r ~/.cursor/decision-plugin/skills/decision-briefing ~/.cursor/rules/decision-briefing
+cp -r ~/.cursor/decision/skills/decision ~/.cursor/rules/decision
+cp -r ~/.cursor/decision/skills/decision-logger ~/.cursor/rules/decision-logger
+cp -r ~/.cursor/decision/skills/decision-briefing ~/.cursor/rules/decision-briefing
 ```
 
 Then create `~/.cursor/hooks.json` (or merge into your existing one):
@@ -106,19 +114,19 @@ Then create `~/.cursor/hooks.json` (or merge into your existing one):
   "hooks": {
     "sessionStart": [
       {
-        "command": "bash $HOME/.cursor/decision-plugin/hooks/session-start.sh",
+        "command": "bash $HOME/.cursor/decision/hooks/session-start.sh",
         "async": false
       }
     ],
     "beforeSubmitPrompt": [
       {
-        "command": "bash $HOME/.cursor/decision-plugin/hooks/autosave.sh",
+        "command": "bash $HOME/.cursor/decision/hooks/autosave.sh",
         "async": true
       }
     ],
     "stop": [
       {
-        "command": "bash $HOME/.cursor/decision-plugin/hooks/session-end.sh",
+        "command": "bash $HOME/.cursor/decision/hooks/session-end.sh",
         "async": false
       }
     ]
@@ -126,14 +134,14 @@ Then create `~/.cursor/hooks.json` (or merge into your existing one):
 }
 ```
 
-Restart Cursor. The `decision-logger` and `decision-briefing` rules will be auto-loadable as agents.
+Restart Cursor. The `decision` skill is auto-loadable as an agent.
 
 ### Windows caveat
 
 Cursor's default shell on Windows is PowerShell, not bash. You have two options:
 
 1. **Recommended:** install [Git for Windows](https://git-scm.com/download/win) so `bash.exe` is on `PATH`, then set Cursor's shell to Git Bash (Settings → Shell → Bash Path).
-2. **Or:** ship a `.cmd` shim next to each `.sh` and call the shim from `hooks.json`. Create `~/.cursor/decision-plugin/hooks/session-start.cmd` containing:
+2. **Or:** ship a `.cmd` shim next to each `.sh` and call the shim from `hooks.json`. Create `~/.cursor/decision/hooks/session-start.cmd` containing:
 
    ```cmd
    @echo off
@@ -155,7 +163,7 @@ alwaysApply: false
 
 # decision-review
 
-When the user types `/decision-review` (or asks you to "review decisions", "catch me up on decisions", "what did we decide about X"), run the briefing from the `decision-briefing` skill files in `~/.cursor/rules/decision-briefing/`.
+When the user types `/decision-review` (or asks you to "review decisions", "catch me up on decisions", "what did we decide about X"), run the briefing from the `decision` skill files in `~/.cursor/rules/decision/`.
 ```
 
 ---
@@ -182,10 +190,11 @@ Windsurf has user-global rules and per-project workflows. There are no lifecycle
 
    ```bash
    mkdir -p ~/.codeium/windsurf/memories
-   git clone --depth 1 https://github.com/code-genom-skill/decision-plugin.git /tmp/decision-plugin
-   cp /tmp/decision-plugin/skills/decision-logger/SKILL.md ~/.codeium/windsurf/memories/decision-logger.md
-   cp /tmp/decision-plugin/skills/decision-briefing/SKILL.md ~/.codeium/windsurf/memories/decision-briefing.md
-   rm -rf /tmp/decision-plugin
+   git clone --depth 1 https://github.com/arpondark/decision.git /tmp/decision
+   cp /tmp/decision/skills/decision/SKILL.md ~/.codeium/windsurf/memories/decision.md
+   cp /tmp/decision/skills/decision-logger/SKILL.md ~/.codeium/windsurf/memories/decision-logger.md
+   cp /tmp/decision/skills/decision-briefing/SKILL.md ~/.codeium/windsurf/memories/decision-briefing.md
+   rm -rf /tmp/decision
    ```
 
 2. Inside any repo where you want the plugin active, create `.windsurf/workflows/decision-review.md`:
@@ -207,10 +216,11 @@ Continue loads user-global rules from `~/.continue/rules/` and slash commands fr
 
 ```bash
 mkdir -p ~/.continue/rules
-git clone --depth 1 https://github.com/code-genom-skill/decision-plugin.git /tmp/decision-plugin
-cp -r /tmp/decision-plugin/skills/decision-logger ~/.continue/rules/decision-logger
-cp -r /tmp/decision-plugin/skills/decision-briefing ~/.continue/rules/decision-briefing
-rm -rf /tmp/decision-plugin
+git clone --depth 1 https://github.com/arpondark/decision.git /tmp/decision
+cp -r /tmp/decision/skills/decision ~/.continue/rules/decision
+cp -r /tmp/decision/skills/decision-logger ~/.continue/rules/decision-logger
+cp -r /tmp/decision/skills/decision-briefing ~/.continue/rules/decision-briefing
+rm -rf /tmp/decision
 ```
 
 Then add a slash command to `~/.continue/config.yaml`:
@@ -232,11 +242,12 @@ Cline reads `.clinerules` from the workspace root. Copy the skill into each repo
 
 ```bash
 # In the repo where you want decisions captured
-git clone --depth 1 https://github.com/code-genom-skill/decision-plugin.git /tmp/decision-plugin
+git clone --depth 1 https://github.com/arpondark/decision.git /tmp/decision
 mkdir -p .clinerules
-cp /tmp/decision-plugin/skills/decision-logger/SKILL.md .clinerules/decision-logger.md
-cp /tmp/decision-plugin/skills/decision-briefing/SKILL.md .clinerules/decision-briefing.md
-rm -rf /tmp/decision-plugin
+cp /tmp/decision/skills/decision/SKILL.md .clinerules/decision.md
+cp /tmp/decision/skills/decision-logger/SKILL.md .clinerules/decision-logger.md
+cp /tmp/decision/skills/decision-briefing/SKILL.md .clinerules/decision-briefing.md
+rm -rf /tmp/decision
 ```
 
 Cline has no hook system, so capture is **manual**: ask Cline to *"log this decision"* and it will write `.decision/<date>-<slug>.md` per the skill body.
@@ -253,8 +264,9 @@ cat >> CONVENTIONS.md <<'EOF'
 
 When the user asks to "log this decision", "why did we decide X", or "review decisions",
 consult the skill bodies at:
-- https://github.com/code-genom-skill/decision-plugin/tree/main/skills/decision-logger
-- https://github.com/code-genom-skill/decision-plugin/tree/main/skills/decision-briefing
+- https://github.com/arpondark/decision/tree/main/skills/decision           (entry point)
+- https://github.com/arpondark/decision/tree/main/skills/decision-logger  (write mode)
+- https://github.com/arpondark/decision/tree/main/skills/decision-briefing (read mode)
 
 Write entries to `.decision/<date>-<slug>.md` and run `/decision-review` to surface the log.
 EOF
@@ -268,13 +280,14 @@ Antigravity is Codeium's agentic IDE. If you have it installed, the most likely 
 
 ```bash
 # Try this and adjust if Antigravity uses a different directory
-mkdir -p ~/.codeium/antigravity/memories ~/.codeium/antigravity/workflows
-git clone --depth 1 https://github.com/code-genom-skill/decision-plugin.git /tmp/decision-plugin
-cp /tmp/decision-plugin/skills/decision-logger/SKILL.md ~/.codeium/antigravity/memories/decision-logger.md
-cp /tmp/decision-plugin/skills/decision-briefing/SKILL.md ~/.codeium/antigravity/memories/decision-briefing.md
-cp -r /tmp/decision-plugin/skills/* ~/.codeium/antigravity/skills/
-cp -r /tmp/decision-plugin/hooks/* ~/.codeium/antigravity/hooks/
-rm -rf /tmp/decision-plugin
+mkdir -p ~/.codeium/antigravity/memories ~/.codeium/antigravity/workflows ~/.codeium/antigravity/skills ~/.codeium/antigravity/hooks
+git clone --depth 1 https://github.com/arpondark/decision.git /tmp/decision
+cp /tmp/decision/skills/decision/SKILL.md ~/.codeium/antigravity/memories/decision.md
+cp /tmp/decision/skills/decision-logger/SKILL.md ~/.codeium/antigravity/memories/decision-logger.md
+cp /tmp/decision/skills/decision-briefing/SKILL.md ~/.codeium/antigravity/memories/decision-briefing.md
+cp -r /tmp/decision/skills/* ~/.codeium/antigravity/skills/
+cp -r /tmp/decision/hooks/* ~/.codeium/antigravity/hooks/
+rm -rf /tmp/decision
 ```
 
 > **Note:** Antigravity is a recent product and its exact skill/rules directory layout could not be verified at the time of writing. If the paths above don't match your install, check Antigravity's docs for where it looks for user-level skills/rules, then copy the same files there. PRs to update this section are welcome.
@@ -289,23 +302,26 @@ After installing in Claude Code, restart and run:
 /decision-review
 ```
 
-You should see a (possibly empty) briefing. If you see "decision-plugin: 0 decisions recorded" it's working — no decisions have been captured yet, just the framework is in place.
+You should see a (possibly empty) briefing. If you see "decision: 0 decisions recorded" it's working — no decisions have been captured yet, just the framework is in place.
 
-For Claude Code, you can also confirm the install by checking that all five hook files exist:
+For Claude Code, you can also confirm the install by checking that all five hook files exist and that the three skills are present:
 
 ```bash
 ls ~/.claude/plugins/decision/hooks/*.sh
 # should print autosave.sh, pre-compact.sh, session-end.sh, session-start.sh, supersedes-check.sh
+ls ~/.claude/plugins/decision/skills/
+# should print: decision/  decision-logger/  decision-briefing/
 ```
 
 For Cursor:
 
 ```bash
-ls ~/.cursor/decision-plugin/hooks/*.sh
+ls ~/.cursor/decision/hooks/*.sh
 cat ~/.cursor/hooks.json
+ls ~/.cursor/rules/decision/SKILL.md
 ```
 
-For other IDEs, just confirm the rule/skills files are in the directory shown in the table above.
+For other IDEs, just confirm the rule/skill files are in the directory shown in the table above.
 
 ---
 
@@ -333,7 +349,7 @@ For other IDEs, the equivalent command is whatever the IDE calls the rule/skill 
 
 ### Per-repo setup (one-time, in the repo where decisions will be written)
 
-The plugin writes entries to `.decision/<date>-<slug>.md` at the **repo root**. Add the buffer directory to `.gitignore` so scratch files don't leak:
+The skill writes entries to `.decision/<date>-<slug>.md` at the **repo root**. Add the buffer directory to `.gitignore` so scratch files don't leak:
 
 ```bash
 echo ".decision/.buffers/" >> .gitignore
@@ -400,7 +416,7 @@ Files live in `.decision/` at the repo root, committed to git. Buffers live in `
 ## Layout
 
 ```
-decision-plugin/
+decision/
 ├── .claude-plugin/plugin.json
 ├── hooks/
 │   ├── hooks.json
@@ -410,8 +426,9 @@ decision-plugin/
 │   ├── session-start.sh
 │   └── supersedes-check.sh
 ├── skills/
-│   ├── decision-logger/SKILL.md
-│   └── decision-briefing/SKILL.md
+│   ├── decision/SKILL.md            # public entry-point skill (name: decision)
+│   ├── decision-logger/SKILL.md     # write-mode sub-capability
+│   └── decision-briefing/SKILL.md   # read-mode sub-capability
 └── commands/decision-review.md
 ```
 

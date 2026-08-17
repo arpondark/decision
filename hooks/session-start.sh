@@ -4,7 +4,7 @@
 # Fired on SessionStart (startup AND resume). Before the new session begins,
 # scan .decision/.buffers/ for any leftover raw buffers or partial files
 # from a prior session that was killed mid-flight. Run the decision-logger
-# skill in finishing-orphan mode to complete them.
+# sub-skill of the decision skill in finishing-orphan mode to complete them.
 #
 # Also: if .decision/*.md exists and there's recent activity, surface a
 # short "N decisions since you last worked here" nudge to the new session
@@ -34,7 +34,7 @@ if [ -d "$BUFFER_DIR" ]; then
       SESSION_ID=$(basename "$BUFFER" .raw)
       PARTIAL="$BUFFER_DIR/${SESSION_ID}.md"
 
-      PROMPT="Run the decision-logger skill in finishing-orphan mode.
+      PROMPT="Run the decision-logger sub-skill of the decision skill in finishing-orphan mode.
 
 Session id: $SESSION_ID
 Repo root: $REPO_ROOT
@@ -47,7 +47,7 @@ If the buffer is empty or contains no decision-shaped content, write a minimal e
 Otherwise apply the filter rule and complete the entry normally."
 
       timeout 80 claude -p "$PROMPT" || {
-        echo "decision-log: orphan sweep failed for $SESSION_ID; leaving buffer for next sweep" >&2
+        echo "decision: orphan sweep failed for $SESSION_ID; leaving buffer for next sweep" >&2
         continue
       }
 
@@ -66,9 +66,9 @@ TOTAL_COUNT=$(find "$DECISION_DIR" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l 
 if [ "$TOTAL_COUNT" -gt 0 ] && [ "$RECENT_COUNT" -gt 0 ]; then
   # Output a single line for the new session to see. Goes to stdout so the
   # hook contract picks it up; the agent will surface it as context.
-  echo "decision-log: $RECENT_COUNT new decisions in the last 14 days. Run /decision-review to catch up."
+  echo "decision: $RECENT_COUNT new decisions in the last 14 days. Run /decision-review to catch up."
 elif [ "$TOTAL_COUNT" -gt 0 ]; then
-  echo "decision-log: $TOTAL_COUNT decisions recorded. Run /decision-review when you want context."
+  echo "decision: $TOTAL_COUNT decisions recorded. Run /decision-review when you want context."
 fi
 
 exit 0

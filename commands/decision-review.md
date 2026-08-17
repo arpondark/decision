@@ -1,5 +1,5 @@
 ---
-description: Read .decision/*.md and produce a condensed briefing on the current state of decisions in this repo. Optionally filter by area.
+description: Read .decision/*.md and produce a condensed briefing on the current state of decisions in this repo. Dispatches via the `decision` skill to its `decision-briefing` sub-capability.
 ---
 
 # /decision-review
@@ -17,7 +17,7 @@ Catch me up on the decisions in this repo. Optionally scoped to a specific area.
 
 ## What it does
 
-Invokes the `decision-briefing` skill. The skill:
+The `decision` skill routes this command to its **`decision-briefing`** sub-capability. The sub-skill:
 
 1. Discovers all `.decision/*.md` under the repo root.
 2. Filters by `area` if you provided one.
@@ -36,4 +36,4 @@ The briefing will say so and offer to scaffold. It won't fabricate.
 
 ## Pass-through
 
-All arguments are forwarded to the `decision-briefing` skill. See `skills/decision-briefing/SKILL.md` for the full contract.
+All arguments are forwarded to the `decision-briefing` sub-skill. See `skills/decision-briefing/SKILL.md` for the full contract.

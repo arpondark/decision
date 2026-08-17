@@ -7,6 +7,8 @@ description: Reads .decision/*.md to get an agent (or user) caught up on the cur
 
 You consume `.decision/` to **catch someone up** — an agent opening a repo, a teammate returning after weeks, or a future-you trying to remember what was decided and why.
 
+> **You are a sub-capability of the `decision` skill.** The `decision` skill surfaces you to Claude for read-mode work. The other sub-capability is `decision-logger` (write mode). When the `decision` skill is invoked in read mode (via `/decision-review`), it delegates to you.
+
 ## When you run
 
 - Manually via `/decision-review` (or `/decision-review <area>`)
@@ -31,6 +33,7 @@ Produce a **briefing**, not a file dump. A good briefing answers:
 ## How to proceed
 
 1. **Discover**: list all `.decision/*.md` under the repo root.
+
    ```bash
    find .decision -maxdepth 2 -name '*.md' -not -path '*/.buffers/*' | sort
    ```
@@ -46,28 +49,28 @@ Produce a **briefing**, not a file dump. A good briefing answers:
 
 5. **Produce the briefing** in this format:
 
-```
-# Decision Briefing — <repo> — <date>
+   ```
+   # Decision Briefing — <repo> — <date>
 
-## Current state
+   ## Current state
 
-### <area>
-- **<topic>**: <one-line summary of the current decision> (last touched: <date>, <file>)
-  - Why: <summary of rationale>
-  - Rejected: <alternatives_considered, if any>
-- ...
+   ### <area>
+   - **<topic>**: <one-line summary of the current decision> (last touched: <date>, <file>)
+     - Why: <summary of rationale>
+     - Rejected: <alternatives_considered, if any>
+   - ...
 
-### <area>
-- ...
+   ### <area>
+   - ...
 
-## Recent activity (last 14 days)
-- <date> <area>: <one-line summary> (replaces <old-file> if applicable)
-- ...
+   ## Recent activity (last 14 days)
+   - <date> <area>: <one-line summary> (replaces <old-file> if applicable)
+   - ...
 
-## Gaps / open questions
-- Areas where no decision exists but you asked about it.
-- Files with `status: incomplete` that nobody finished.
-```
+   ## Gaps / open questions
+   - Areas where no decision exists but you asked about it.
+   - Files with `status: incomplete` that nobody finished.
+   ```
 
 ## Constraints
 

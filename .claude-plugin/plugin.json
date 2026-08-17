@@ -1,9 +1,9 @@
 {
   "name": "decision",
   "version": "0.1.0",
-  "description": "Captures *why* decisions were made during Claude Code sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-reading history or re-deriving context.",
+  "description": "Claude Code skill named 'decision' that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-reading history or re-deriving context. One skill, two modes: write (capture) and read (briefing).",
   "author": {
-    "name": "code-genom-skill"
+    "name": "arpondark"
   },
   "license": "MIT",
   "keywords": [
@@ -11,7 +11,9 @@
     "memory",
     "context",
     "briefing",
-    "knowledge-management"
+    "knowledge-management",
+    "skill",
+    "decision"
   ],
   "commands": "./commands",
   "skills": "./skills",

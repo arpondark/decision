@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # session-end.sh — clean-close path
 #
-# Fired on SessionEnd. Invokes the decision-logger skill to do a full
+# Fired on SessionEnd. Invokes the decision-logger sub-skill of the decision skill
 # filter+summarize pass on the session transcript, writes the .decision/*.md
 # entry, and marks status: complete.
 #
@@ -41,8 +41,8 @@ DECISION_DIR="$REPO_ROOT/.decision"
 BUFFER_FILE="$DECISION_DIR/.buffers/${SESSION_ID}.raw"
 SESSION_PARTIAL="$DECISION_DIR/.buffers/${SESSION_ID}.md"
 
-# Build the prompt for the decision-logger skill
-PROMPT="Run the decision-logger skill in finalize mode for this session.
+# Build the prompt for the decision-logger sub-skill (write mode) of the decision skill
+PROMPT="Run the decision-logger sub-skill of the decision skill in finalize mode for this session.
 
 Session id: $SESSION_ID
 Repo root: $REPO_ROOT
@@ -54,20 +54,20 @@ Status: complete (clean session-end)
 
 If the transcript file does not exist, fall back to reading the raw buffer at \$BUFFER_FILE. If neither exists, write a minimal entry with summary: 'Session ended before any content was captured.' and exit.
 
-Apply the filter rule strictly. If nothing decision-shaped happened, do NOT write a file. Output a single line: 'decision-logger: skip' and exit.
+Apply the filter rule strictly. If nothing decision-shaped happened, do NOT write a file. Output a single line: 'decision: skip' and exit.
 
-Otherwise write the file and output: 'decision-logger: wrote <path-to-file>'."
+Otherwise write the file and output: 'decision: wrote <path-to-file>'."
 
 # Invoke Claude headless to run the skill. -p / --print is non-interactive.
 # If `claude` is not on PATH, skip silently — we don't want a broken hook to break sessions.
 if ! command -v claude >/dev/null 2>&1; then
-  echo "decision-log: claude CLI not found on PATH; skipping session-end summary" >&2
+  echo "decision: claude CLI not found on PATH; skipping session-end summary" >&2
   exit 0
 fi
 
 # Soft timeout; the hard cap is set in hooks.json.
 timeout 100 claude -p "$PROMPT" || {
-  echo "decision-log: claude -p failed or timed out; raw buffer preserved at $BUFFER_FILE for next sweep" >&2
+  echo "decision: claude -p failed or timed out; raw buffer preserved at $BUFFER_FILE for next sweep" >&2
   exit 0
 }
 
