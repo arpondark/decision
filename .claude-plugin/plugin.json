@@ -1,0 +1,19 @@
+{
+  "name": "decision",
+  "version": "0.1.0",
+  "description": "Captures *why* decisions were made during Claude Code sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-reading history or re-deriving context.",
+  "author": {
+    "name": "code-genom-skill"
+  },
+  "license": "MIT",
+  "keywords": [
+    "decisions",
+    "memory",
+    "context",
+    "briefing",
+    "knowledge-management"
+  ],
+  "commands": "./commands",
+  "skills": "./skills",
+  "hooks": "./hooks/hooks.json"
+}

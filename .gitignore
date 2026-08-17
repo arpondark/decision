@@ -1,0 +1,23 @@
+# Node / npm
+node_modules/
+npm-debug.log*
+*.log
+
+# Tests / scratch
+.tmp/
+coverage/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Decision plugin runtime buffers (per-repo, written by hooks)
+# Decisions themselves (.decision/*.md) are committed; only the raw scratch buffers are ignored.
+.decision/.buffers/
+
+# npm publish noise (the files list in package.json is authoritative)
+.npmignore

@@ -1,0 +1,12 @@
+# This file is created by the `decision` plugin to instruct repos that use
+# it to ignore the scratch buffer directory. The .decision/*.md files
+# themselves are committed (they're the product); the .buffers/ scratch
+# directory is not.
+#
+# Add this to your repo's .gitignore by running:
+#   echo "$(cat .decision-ignore)" >> .gitignore
+# or just include the line:
+#   .decision/.buffers/
+# manually.
+
+.decision/.buffers/

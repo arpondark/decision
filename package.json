@@ -1,0 +1,44 @@
+{
+  "name": "decision-plugin",
+  "version": "0.1.0",
+  "description": "Claude Code plugin that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context.",
+  "license": "MIT",
+  "author": {
+    "name": "code-genom-skill"
+  },
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "decisions",
+    "memory",
+    "context",
+    "briefing",
+    "knowledge-management",
+    "ai"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "main": ".claude-plugin/plugin.json",
+  "files": [
+    ".claude-plugin/",
+    "hooks/",
+    "skills/",
+    "commands/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "pack:dry": "npm pack --dry-run",
+    "publish:public": "npm publish --access public",
+    "publish:dry": "npm publish --dry-run --access public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-genom-skill/decision-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/code-genom-skill/decision-plugin/issues"
+  },
+  "homepage": "https://github.com/code-genom-skill/decision-plugin#readme"
+}
