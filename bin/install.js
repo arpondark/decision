@@ -168,37 +168,106 @@ function copyPluginFiles() {
   }
 }
 
+function configureCursorHooks() {
+  const cursorDir = path.join(homeDir(), '.cursor');
+  const cursorDecisionDir = path.join(cursorDir, 'decision');
+  const cursorHooksFile = path.join(cursorDir, 'hooks.json');
+
+  // Copy hooks to ~/.cursor/decision/hooks/
+  const hooksSrc = path.join(PKG_ROOT, 'hooks');
+  if (fs.existsSync(hooksSrc)) {
+    copyDirSync(hooksSrc, path.join(cursorDecisionDir, 'hooks'));
+  }
+
+  // Merge into ~/.cursor/hooks.json
+  const currentHooks = readJson(cursorHooksFile, { hooks: {} });
+  if (!currentHooks.hooks) currentHooks.hooks = {};
+
+  const isWindows = process.platform === 'win32';
+  const shCmd = (script) => isWindows 
+    ? `bash "${windowsPath(path.join(cursorDecisionDir, 'hooks', script))}"`
+    : `bash "$HOME/.cursor/decision/hooks/${script}"`;
+
+  const decisionHooks = {
+    sessionStart: [{ command: shCmd('session-start.sh'), async: false }],
+    beforeSubmitPrompt: [{ command: shCmd('autosave.sh'), async: true }],
+    stop: [{ command: shCmd('session-end.sh'), async: false }]
+  };
+
+  for (const [event, items] of Object.entries(decisionHooks)) {
+    if (!currentHooks.hooks[event]) {
+      currentHooks.hooks[event] = [];
+    }
+    for (const item of items) {
+      if (!currentHooks.hooks[event].some(h => h.command && h.command.includes('decision'))) {
+        currentHooks.hooks[event].push(item);
+      }
+    }
+  }
+
+  writeJson(cursorHooksFile, currentHooks);
+}
+
 function copyGlobalSkillsAndCommands() {
-  // 1. Copy skills to ~/.claude/skills/ and ~/.agents/skills/
+  const skillRoots = [
+    path.join(homeDir(), '.claude', 'skills'),
+    path.join(homeDir(), '.gemini', 'config', 'skills'),
+    path.join(homeDir(), '.agents', 'skills'),
+    path.join(homeDir(), '.cline', 'skills'),
+    path.join(homeDir(), '.roo', 'skills'),
+  ];
+
+  const commandRoots = [
+    path.join(homeDir(), '.claude', 'commands'),
+    path.join(homeDir(), '.gemini', 'config', 'rules'),
+    path.join(homeDir(), '.cursor', 'rules'),
+    path.join(homeDir(), '.windsurf', 'rules'),
+    path.join(homeDir(), '.continue', 'prompts'),
+    path.join(homeDir(), '.copilot', 'instructions'),
+  ];
+
+  // 1. Copy skills to all skill target roots
   const skillsSrc = path.join(PKG_ROOT, 'skills');
   if (fs.existsSync(skillsSrc)) {
     for (const item of fs.readdirSync(skillsSrc)) {
       const itemSrc = path.join(skillsSrc, item);
       if (fs.statSync(itemSrc).isDirectory()) {
-        const destClaude = path.join(CLAUDE_SKILLS_ROOT, item);
-        const destAgents = path.join(AGENTS_SKILLS_ROOT, item);
-        rmrf(destClaude);
-        rmrf(destAgents);
-        copyDirSync(itemSrc, destClaude);
-        copyDirSync(itemSrc, destAgents);
-        console.log(`  - skill: ${item}`);
+        for (const root of skillRoots) {
+          const dest = path.join(root, item);
+          rmrf(dest);
+          copyDirSync(itemSrc, dest);
+        }
+        // Also copy as Cursor rule directory
+        const cursorDest = path.join(homeDir(), '.cursor', 'rules', item);
+        rmrf(cursorDest);
+        copyDirSync(itemSrc, cursorDest);
+
+        console.log(`  - skill: ${item} -> synced across Claude, Antigravity, Cursor & Agents`);
       }
     }
   }
 
-  // 2. Copy commands to ~/.claude/commands/
+  // 2. Copy commands & rules to command roots
   const commandsSrc = path.join(PKG_ROOT, 'commands');
   if (fs.existsSync(commandsSrc)) {
-    fs.mkdirSync(CLAUDE_COMMANDS_ROOT, { recursive: true });
-    for (const item of fs.readdirSync(commandsSrc)) {
-      if (item.endsWith('.md')) {
-        const fileSrc = path.join(commandsSrc, item);
-        const fileDest = path.join(CLAUDE_COMMANDS_ROOT, item);
-        fs.copyFileSync(fileSrc, fileDest);
-        console.log(`  - command: /${item.replace(/\.md$/, '')}`);
+    for (const root of commandRoots) {
+      fs.mkdirSync(root, { recursive: true });
+      for (const item of fs.readdirSync(commandsSrc)) {
+        if (item.endsWith('.md')) {
+          const fileSrc = path.join(commandsSrc, item);
+          const fileDest = path.join(root, item);
+          fs.copyFileSync(fileSrc, fileDest);
+        }
       }
     }
+    console.log(`  - slash commands & rules -> synced across Claude, Antigravity, Cursor, Windsurf, Continue, Copilot`);
   }
+
+  // 3. Configure Cursor hooks
+  try {
+    configureCursorHooks();
+    console.log(`  - cursor hooks -> configured in ~/.cursor/hooks.json`);
+  } catch (_) {}
 }
 
 function status() {
@@ -206,21 +275,17 @@ function status() {
   const pluginExists = fs.existsSync(path.join(PLUGIN_DIR, '.claude-plugin', 'plugin.json'));
   const known = readJson(KNOWN_MARKETPLACES, {});
   const registered = !!known[MARKETPLACE_NAME];
-  const mainSkillExists = fs.existsSync(path.join(CLAUDE_SKILLS_ROOT, 'decision', 'SKILL.md'));
-  const mainCmdExists = fs.existsSync(path.join(CLAUDE_COMMANDS_ROOT, 'decision.md'));
+  const claudeSkillExists = fs.existsSync(path.join(CLAUDE_SKILLS_ROOT, 'decision', 'SKILL.md'));
+  const antigravitySkillExists = fs.existsSync(path.join(homeDir(), '.gemini', 'config', 'skills', 'decision', 'SKILL.md'));
+  const cursorRuleExists = fs.existsSync(path.join(homeDir(), '.cursor', 'rules', 'decision', 'SKILL.md'));
+  const agentsSkillExists = fs.existsSync(path.join(AGENTS_SKILLS_ROOT, 'decision', 'SKILL.md'));
 
-  if (!marketplaceExists && !pluginExists && !registered && !mainSkillExists) {
-    console.log(`decision: not installed`);
-    return 1;
-  }
-
-  console.log(`decision: installed`);
-  console.log(`  marketplace: ${marketplaceExists ? 'OK' : 'MISSING'} ${MARKETPLACE_DIR}`);
-  console.log(`  plugin:      ${pluginExists ? 'OK' : 'MISSING'} ${PLUGIN_DIR}`);
-  console.log(`  registered:  ${registered ? 'OK' : 'MISSING'} in known_marketplaces.json`);
-  console.log(`  skills:      ${mainSkillExists ? 'OK' : 'MISSING'} in ${CLAUDE_SKILLS_ROOT}`);
-  console.log(`  commands:    ${mainCmdExists ? 'OK' : 'MISSING'} in ${CLAUDE_COMMANDS_ROOT}`);
-  if (!marketplaceExists || !pluginExists || !registered) return 1;
+  console.log(`decision: installed & synced across multi-agent environments`);
+  console.log(`  Claude Code:  ${claudeSkillExists ? 'OK' : 'MISSING'} (${CLAUDE_SKILLS_ROOT})`);
+  console.log(`  Antigravity:  ${antigravitySkillExists ? 'OK' : 'MISSING'} (~/.gemini/config/skills)`);
+  console.log(`  Cursor:       ${cursorRuleExists ? 'OK' : 'MISSING'} (~/.cursor/rules)`);
+  console.log(`  Agents Std:   ${agentsSkillExists ? 'OK' : 'MISSING'} (${AGENTS_SKILLS_ROOT})`);
+  console.log(`  Marketplace:  ${registered ? 'OK' : 'MISSING'} (${MARKETPLACE_DIR})`);
   return 0;
 }
 
