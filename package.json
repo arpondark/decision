@@ -1,6 +1,6 @@
 {
   "name": "@arpon007/decision",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Claude Code skill (name: decision) that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context. Install with `npm install -g @arpon007/decision` and the rest happens automatically. Plugin source: https://github.com/arpondark/decision",
   "license": "MIT",
   "author": {
@@ -22,7 +22,7 @@
   },
   "main": ".claude-plugin/plugin.json",
   "bin": {
-    "decision": "./bin/install.js"
+    "decision": "bin/decision.js"
   },
   "files": [
     ".claude-plugin/",
@@ -30,6 +30,7 @@
     "skills/",
     "commands/",
     "bin/",
+    "SKILL.md",
     "README.md",
     "LICENSE"
   ],

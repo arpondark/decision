@@ -1,8 +1,12 @@
 ---
-description: Read .decision/*.md and produce a condensed briefing on the current state of decisions in this repo. Dispatches via the `decision` skill to its `decision-briefing` sub-capability.
+description: Read .decision/*.md and produce a condensed briefing on the current state of decisions in this repo.
+argument-hint: [area] [--since Nd] [--all]
+allowed-tools: Read, Glob, Grep, Bash
 ---
 
 # /decision-review
+
+Catch me up on the decisions in this repo. Invoke the `decision` skill to dispatch to its `decision-briefing` sub-capability with $ARGUMENTS.
 
 Catch me up on the decisions in this repo. Optionally scoped to a specific area.
 

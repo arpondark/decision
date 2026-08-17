@@ -1,10 +1,11 @@
 {
   "name": "decision",
-  "version": "0.1.0",
-  "description": "Claude Code skill named 'decision' that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-reading history or re-deriving context. One skill, two modes: write (capture) and read (briefing).",
+  "version": "0.1.2",
+  "description": "Captures *why* decisions were made during a session so any agent can get caught up without re-reading history. Run /decision or /decision-review to read.",
   "author": {
     "name": "arpondark"
   },
+  "homepage": "https://github.com/arpondark/decision",
   "license": "MIT",
   "keywords": [
     "decisions",
@@ -14,8 +15,5 @@
     "knowledge-management",
     "skill",
     "decision"
-  ],
-  "commands": "./commands",
-  "skills": "./skills",
-  "hooks": "./hooks/hooks.json"
+  ]
 }

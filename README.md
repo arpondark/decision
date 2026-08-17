@@ -1,23 +1,28 @@
 # decision
 
-A Claude Code **skill named `decision`** that automatically captures **why** decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent (yours or a teammate's) can get caught up without re-reading history or re-deriving context that already exists.
+A Claude Code & AI Agent **skill named `decision`** that automatically captures **why** decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent (yours or a teammate's) can get caught up without re-reading history or re-deriving context that already exists.
 
-`/decision-review` to read. Hooks to write. Filter is strict: only decision-shaped sessions leave a trace.
+Run `/decision` or `/decision-review` to read. Hooks to write. Filter is strict: only decision-shaped sessions leave a trace.
 
 The public skill name is **`decision`**. Inside it, the skill dispatches to two named sub-capabilities:
 
 - **`decision-logger`** — write mode (capture).
 - **`decision-briefing`** — read mode (briefing).
 
-The `decision` skill is the entry point Claude Code loads; when work needs to happen, it invokes the appropriate sub-skill by name. Hooks and slash commands reference the sub-skill names directly.
+Available slash commands:
+- `/decision` — main command (read briefing or log decision)
+- `/decision-review` — read decision briefing
+- `/decision-logger` — force capture session decisions
+- `/decision-briefing` — read decision briefing
 
-Works with **Claude Code** (full hook support), **Cursor** (real hooks), and degrades gracefully to other AI IDEs via rules + slash commands.
+Works with **Claude Code** (full hook support), **skills.sh** (`npx skills add arpondark/decision`), **Cursor** (real hooks), and degrades gracefully to other AI IDEs via rules + slash commands.
 
 ---
 
 ## Table of contents
 
-- [Install in Claude Code](#install-in-claude-code) — full hook support
+- [Install via skills.sh](#install-via-skillssh-recommended) — works with Claude Code, Cursor, Antigravity, & all skills.sh agents
+- [Install in Claude Code](#install-in-claude-code) — npm registry & standalone options
 - [Install in Cursor](#install-in-cursor) — real hooks on sessionStart / preCompact / etc.
 - [Install in other AI IDEs](#install-in-other-ai-ides) — Windsurf, Continue, Cline, Aider, Antigravity
 - [Verify it worked](#verify-it-worked)
@@ -30,19 +35,35 @@ Works with **Claude Code** (full hook support), **Cursor** (real hooks), and deg
 
 ---
 
+## Install via skills.sh (Recommended)
+
+You can install this skill directly using the `skills.sh` CLI into any supported AI agent:
+
+```bash
+npx skills add arpondark/decision
+```
+
+Or for Claude Code specifically:
+
+```bash
+npx skills add arpondark/decision -a claude-code -g
+```
+
+---
+
 ## Install in Claude Code
 
-Pick **one** of the three install methods below. They all do the same thing — get the plugin files into `~/.claude/plugins/decision/` so Claude Code picks them up.
+Pick **one** of the install methods below. They all set up the plugin, skills, and slash commands in `~/.claude/` so Claude Code picks them up automatically.
 
-### Method 1 — npm registry (recommended for everyone else)
+### Method 1 — npm registry
 
-One command. The package's `postinstall` script copies the plugin into `~/.claude/plugins/decision/` for you.
+One command. The package's `postinstall` script registers the plugin, skills, and slash commands (`/decision`, `/decision-review`, etc.) for you.
 
 ```bash
 npm install -g @arpon007/decision
 ```
 
-That's it. Restart Claude Code and run `/decision-review`.
+That's it. Restart Claude Code and run `/decision`.
 
 > **Note:** the npm package name is `@arpon007/decision` (scoped, because plain `decision` is taken on npm). The skill itself is still called **`decision`** — the scope is just npm's namespace. If you fork and re-publish under your own scope, replace `@arpon007` with yours.
 
