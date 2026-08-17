@@ -1,7 +1,7 @@
 {
   "name": "@arpon007/decision",
-  "version": "0.1.0",
-  "description": "Claude Code skill (name: decision) that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context. Plugin source: https://github.com/arpondark/decision",
+  "version": "0.1.1",
+  "description": "Claude Code skill (name: decision) that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context. Install with `npm install -g @arpon007/decision` and the rest happens automatically. Plugin source: https://github.com/arpondark/decision",
   "license": "MIT",
   "author": {
     "name": "arpondark",
@@ -21,22 +21,28 @@
     "node": ">=18"
   },
   "main": ".claude-plugin/plugin.json",
+  "bin": {
+    "decision": "./bin/install.js"
+  },
   "files": [
     ".claude-plugin/",
     "hooks/",
     "skills/",
     "commands/",
+    "bin/",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
+    "postinstall": "node ./bin/install.js",
+    "prepublishOnly": "npm run pack:dry",
     "pack:dry": "npm pack --dry-run",
     "publish:public": "npm publish --access public",
     "publish:dry": "npm publish --dry-run --access public"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/arpondark/decision.git"
+    "url": "git+https://github.com/arpondark/decision.git"
   },
   "bugs": {
     "url": "https://github.com/arpondark/decision/issues"

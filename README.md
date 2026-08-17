@@ -36,18 +36,24 @@ Pick **one** of the three install methods below. They all do the same thing — 
 
 ### Method 1 — npm registry (recommended for everyone else)
 
+One command. The package's `postinstall` script copies the plugin into `~/.claude/plugins/decision/` for you.
+
 ```bash
 npm install -g @arpon007/decision
-mkdir -p ~/.claude/plugins/decision
-cp -r "$(npm root -g)/@arpon007/decision/.claude-plugin" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/@arpon007/decision/hooks" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/@arpon007/decision/skills" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/@arpon007/decision/commands" ~/.claude/plugins/decision/
 ```
 
-> **Note:** the npm package name is `@arpon007/decision` (scoped, because plain `decision` is taken on npm). The skill itself is still called **`decision`** — the scope is just npm's namespace. If you fork and re-publish under your own scope, replace `@arpon007` with yours everywhere.
+That's it. Restart Claude Code and run `/decision-review`.
 
-Restart Claude Code. Done.
+> **Note:** the npm package name is `@arpon007/decision` (scoped, because plain `decision` is taken on npm). The skill itself is still called **`decision`** — the scope is just npm's namespace. If you fork and re-publish under your own scope, replace `@arpon007` with yours.
+
+The install also exposes a `decision` CLI for later:
+
+```bash
+decision          # re-run install (alias for `decision install`)
+decision status   # show install path and confirm it's wired up
+decision update   # re-copy files from the latest package into ~/.claude/plugins/decision/
+decision uninstall
+```
 
 #### As a project-scoped dep instead
 
@@ -56,10 +62,10 @@ If you'd rather not install globally (e.g. for a CI runner or to pin a version p
 ```bash
 # In your repo root
 npm install @arpon007/decision
-mkdir -p ~/.claude/plugins/decision
-cp -r node_modules/@arpon007/decision/.claude-plugin ~/.claude/plugins/decision/
-cp -r node_modules/@arpon007/decision/{hooks,skills,commands} ~/.claude/plugins/decision/
+node node_modules/@arpon007/decision/bin/install.js
 ```
+
+The same script copies files into `~/.claude/plugins/decision/`.
 
 ### Method 2 — directly from GitHub (no npm publish required)
 
