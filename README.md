@@ -37,13 +37,15 @@ Pick **one** of the three install methods below. They all do the same thing — 
 ### Method 1 — npm registry (recommended for everyone else)
 
 ```bash
-npm install -g decision
+npm install -g @arpon007/decision
 mkdir -p ~/.claude/plugins/decision
-cp -r "$(npm root -g)/decision/.claude-plugin" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/decision/hooks" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/decision/skills" ~/.claude/plugins/decision/
-cp -r "$(npm root -g)/decision/commands" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/@arpon007/decision/.claude-plugin" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/@arpon007/decision/hooks" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/@arpon007/decision/skills" ~/.claude/plugins/decision/
+cp -r "$(npm root -g)/@arpon007/decision/commands" ~/.claude/plugins/decision/
 ```
+
+> **Note:** the npm package name is `@arpon007/decision` (scoped, because plain `decision` is taken on npm). The skill itself is still called **`decision`** — the scope is just npm's namespace. If you fork and re-publish under your own scope, replace `@arpon007` with yours everywhere.
 
 Restart Claude Code. Done.
 
@@ -53,10 +55,10 @@ If you'd rather not install globally (e.g. for a CI runner or to pin a version p
 
 ```bash
 # In your repo root
-npm install decision
+npm install @arpon007/decision
 mkdir -p ~/.claude/plugins/decision
-cp -r node_modules/decision/.claude-plugin ~/.claude/plugins/decision/
-cp -r node_modules/decision/{hooks,skills,commands} ~/.claude/plugins/decision/
+cp -r node_modules/@arpon007/decision/.claude-plugin ~/.claude/plugins/decision/
+cp -r node_modules/@arpon007/decision/{hooks,skills,commands} ~/.claude/plugins/decision/
 ```
 
 ### Method 2 — directly from GitHub (no npm publish required)

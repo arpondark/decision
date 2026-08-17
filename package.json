@@ -1,10 +1,11 @@
 {
-  "name": "decision",
+  "name": "@arpon007/decision",
   "version": "0.1.0",
-  "description": "Claude Code skill (name: decision) that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context.",
+  "description": "Claude Code skill (name: decision) that captures *why* decisions were made during sessions — sourced from user prompts, not commit diffs — so any agent can get caught up without re-deriving context. Plugin source: https://github.com/arpondark/decision",
   "license": "MIT",
   "author": {
-    "name": "arpondark"
+    "name": "arpondark",
+    "url": "https://github.com/arpondark/decision"
   },
   "keywords": [
     "claude-code",
@@ -40,5 +41,9 @@
   "bugs": {
     "url": "https://github.com/arpondark/decision/issues"
   },
-  "homepage": "https://github.com/arpondark/decision#readme"
+  "homepage": "https://github.com/arpondark/decision#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }
